@@ -8,6 +8,7 @@ class LoginValidator{
   List<User> users=[];
   User? user;
 
+ // istediğimiz form validationları buradan ekleyebiliriz
 
   Future<Message> findPerson(String email,String pass)async {
     users = await HttpController().getAllUser();

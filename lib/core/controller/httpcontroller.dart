@@ -1,16 +1,12 @@
-
 import 'dart:convert';
-
-import 'package:casestudy/core/riverpod/riverpod.dart';
 import 'package:casestudy/entity/participant.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../entity/user.dart';
 import '../sharedpreferences/sharedprefence.dart';
 class HttpController {
-
+    var tokenProvider ;
 
   Future<List<User>> getAllUser() async {
     List<User> users = [];
@@ -65,7 +61,9 @@ class HttpController {
 
     return partic;
   }
-  Future<bool> LoginUser(String email, String pass,context) async {
+
+
+  Future<bool> LoginUser(String email, String pass, context) async {
     final response = await http.post(
       Uri.parse('https://reqres.in/api/login'),
       body: {
@@ -77,9 +75,10 @@ class HttpController {
       var data = jsonDecode(response.body);
       if (data.containsKey("token")) {
         await SharedPref().initialize();
-       // context.read(RiverpodController().tokenProvider).state = "QpwL5tke4Pnpja7X4";
+        // token riverpod a eklendi
+         tokenProvider = StateProvider<String?>((ref) =>data["token"]);
 
-        //token eklemesi burda çağrılıyor
+        // sharedPref e   token eklendi
         await SharedPref().saveToken(data["token"]);
         snackbar(context, "Kullanıcı girişi başarılı");
         return true;
@@ -88,7 +87,8 @@ class HttpController {
         return false;
       }
     } else {
-      snackbar(context,  response.body.toString());
+      var msj =jsonDecode(response.body);
+      snackbar(context, msj["error"].toString());
       return false;
     }
   }
